@@ -1,6 +1,6 @@
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Select } from 'src/ui/select';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
@@ -14,6 +14,7 @@ import {
 	defaultArticleState,
 	OptionType,
 } from 'src/constants/articleProps';
+import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 import { useTheme } from './hooks/useThemeContext';
 import clsx from 'clsx';
 
@@ -30,6 +31,7 @@ type LocalState = {
 export const ArticleParamsForm = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { setThemeOption } = useTheme();
+	const rootRef = useRef<HTMLDivElement>(null);
 
 	const [localState, setLocalState] = useState<LocalState>({
 		fontFamily: defaultArticleState.fontFamilyOption,
@@ -82,11 +84,18 @@ export const ArticleParamsForm = () => {
 		setLocalState(resetState);
 	};
 
+	useOutsideClickClose({
+		isOpen,
+		rootRef,
+		onChange: setIsOpen,
+	});
+
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 			<aside
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
+				className={clsx(styles.container, { [styles.container_open]: isOpen })}
+				ref={rootRef}>
 				<form className={styles.form} onSubmit={handleApply}>
 					<Text as='h1' size={31} weight={800} uppercase dynamicLite>
 						Задайте параметры
